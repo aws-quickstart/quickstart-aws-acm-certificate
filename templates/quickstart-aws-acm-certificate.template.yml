@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: "(qs-1ot302h6c) Creates R53 records and ACM Certificate."
+Description: "(qp-1qbm4mo1r) Creates R53 records and ACM Certificate."
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
