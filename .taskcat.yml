@@ -26,33 +26,23 @@ project:
       QSS3BucketRegion: $[taskcat_current_region]
       QSS3Prefix: quickstart-aws-acm-certificate/
 tests:
-  single-region:
-    regions:
-    - us-west-2
-    parameters:
-      HostedZoneID: HostedZoneIDHere # eg: ZXCK1XYAAAAAA
-      LoadBalancerFQDN: some.dns.name.here
-      SSLCertificateArn: ''
-    template: templates/quickstart-aws-acm-certificate.template.yml
-  # multiregion-test:
-  #   regions:
-  #   # No SSM Support
-  #   # - eu-north-1 # StockHolm
-  #   - ap-south-1
-  #   - eu-west-3
-  #   - eu-west-2
-  #   - eu-west-1
-  #   - ap-northeast-3
-  #   - ap-northeast-2
-  #   - ap-northeast-1
-  #   - sa-east-1
-  #   - ca-central-1
-  #   - ap-southeast-1
-  #   - ap-southeast-2
-  #   - eu-central-1
-  #   - us-east-1
-  #   - us-east-2
-  #   - us-west-2
-  #   - ap-east-1
-  #   - me-south-1
-  #   template: templates/quickstart-aws-acm-certificate.template.yml
+   multiregion-test:
+     regions:
+     - eu-north-1 # StockHolm
+     - ap-south-1
+     - eu-west-3
+     - eu-west-2
+     - eu-west-1
+     - ap-northeast-2
+     - ap-northeast-1
+     - sa-east-1
+     - ca-central-1
+     - ap-southeast-1
+     - ap-southeast-2
+     - eu-central-1
+     - us-east-1
+     - us-east-2
+     - us-west-2
+     - ap-east-1
+     - me-south-1
+     template: templates/quickstart-aws-acm-certificate.template.yml
