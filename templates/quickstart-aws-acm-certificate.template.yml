@@ -92,7 +92,7 @@ Conditions:
     Fn::Not:
     - Fn::Equals:
         - Ref: QSS3KeyPrefix
-        - 'quickstart-aws-acm-certificate/'
+        - quickstart-aws-acm-certificate/
 Resources:
   # So we can copy the ACM lambda everywhere
   CopyZips:
@@ -113,7 +113,7 @@ Resources:
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
         #SourceObjects:  "functions/packages/ACMCert/lambda.zip"
-        SourceObjects: !If [IsSubmodule, !Sub "${QSS3KeyPrefix}submodules/quickstart-aws-acm-certificate/functions/packages/ACMCert/lambda.zip", !Sub "${QSS3KeyPrefix}functions/packages/ACMCert/lambda.zip"]
+        SourceObjects: !If [IsSubmodule, !Sub "submodules/quickstart-aws-acm-certificate/functions/packages/ACMCert/lambda.zip", !Sub "functions/packages/ACMCert/lambda.zip"]
   ACMCertificateRole:
     Condition: SetupRoute53
     Type: AWS::IAM::Role
@@ -153,11 +153,6 @@ Resources:
           - Effect: Allow
             Action:
             - logs:FilterLogEvents
-            Resource:
-            - "*"
-          - Effect: Allow
-            Action:
-            - s3:*
             Resource:
             - "*"
   ACMCertificateLambda:
