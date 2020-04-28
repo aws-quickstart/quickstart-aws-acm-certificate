@@ -170,8 +170,7 @@ Resources:
       Timeout: 900
       Code:
         S3Bucket: !GetAtt "CopyZips.Outputs.LambdaZipsBucket"
-        S3Key:
-          Fn::Sub: "${QSS3KeyPrefix}functions/packages/ACMCert/lambda.zip"
+        S3Key: !If [ IsSubmodule, !Sub "${QSS3KeyPrefix}submodules/quickstart-aws-acm-certificate/functions/packages/ACMCert/lambda.zip" ,!Sub "${QSS3KeyPrefix}functions/packages/ACMCert/lambda.zip"]
   ACMCertificateDNS:
     Condition: SetupRoute53
     Type: AWS::CloudFormation::CustomResource
