@@ -51,7 +51,7 @@ def handler(event, context):
                         logging.error('timed out waiting for ResourceRecord')
                         status = cfnresponse.FAILED
                     time.sleep(15)
-            rs = [{'Action': 'CREATE', 'ResourceRecordSet': {'Name': r, 'Type': 'CNAME', 'TTL': 600,'ResourceRecords': [{'Value': rs[r]}]}} for r in rs.keys()]
+            rs = [{'Action': 'UPSERT', 'ResourceRecordSet': {'Name': r, 'Type': 'CNAME', 'TTL': 600,'ResourceRecords': [{'Value': rs[r]}]}} for r in rs.keys()]
             try:
                 r53_client.change_resource_record_sets(HostedZoneId=event['ResourceProperties']['HostedZoneId'], ChangeBatch={'Changes': rs})
             except Exception as e:
