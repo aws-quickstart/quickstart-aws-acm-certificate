@@ -105,16 +105,14 @@ Resources:
     Properties:
       TemplateURL:
         !Sub
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${Path}'
-          - Path:  !If [IsSubmodule, !Sub "${QSS3KeyPrefix}submodules/quickstart-aws-acm-certificate/submodules/lambda-copyzips/templates/copy-zips.template.yaml", !Sub "${QSS3KeyPrefix}submodules/lambda-copyzips/templates/copy-zips.template.yaml"]
-            S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/lambda-copyzips/templates/copy-zips.template.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
-        #SourceObjects:  "functions/packages/ACMCert/lambda.zip"
-        SourceObjects: !If [IsSubmodule, !Sub "submodules/quickstart-aws-acm-certificate/functions/packages/ACMCert/lambda.zip", !Sub "functions/packages/ACMCert/lambda.zip"]
+        SourceObjects: "functions/packages/ACMCert/lambda.zip"
   ACMCertificateRole:
     Condition: SetupRoute53
     Type: AWS::IAM::Role
@@ -171,7 +169,7 @@ Resources:
       Timeout: 900
       Code:
         S3Bucket: !GetAtt "CopyZips.Outputs.LambdaZipsBucket"
-        S3Key: !If [ IsSubmodule, !Sub "${QSS3KeyPrefix}submodules/quickstart-aws-acm-certificate/functions/packages/ACMCert/lambda.zip" ,!Sub "${QSS3KeyPrefix}functions/packages/ACMCert/lambda.zip"]
+        S3Key: !Sub "${QSS3KeyPrefix}functions/packages/ACMCert/lambda.zip"
   ACMCertificateDNS:
     Condition: SetupRoute53
     Type: AWS::CloudFormation::CustomResource
