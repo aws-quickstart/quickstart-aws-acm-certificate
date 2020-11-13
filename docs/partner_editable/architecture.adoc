@@ -25,3 +25,4 @@ Shell (SSH) access to EC2 instances in public and private subnets.*
 * <describe any additional components>.
 
 [.small]#*The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
+this is how we do it.
