@@ -170,7 +170,7 @@ Resources:
       Description: Creates and verifies an ACM certificate using DNS validation and
         route53
       Handler: lambda_function.handler
-      Runtime: python2.7
+      Runtime: python3.7
       Role:
         Fn::GetAtt:
         - ACMCertificateRole
