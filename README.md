@@ -1,7 +1,9 @@
 # quickstart-aws-acm-certificate
-This quickstart module takes care of all the moving parts of creating an ACM certificate to declutter other quickstarts with the extra logic required.
+This Quick Start module provides a simple way to create validated public ACM certificates using
+either DNS or email validation. The DNS validation for the certificate is automated through custom
+lambda 
 
-## Inputs parameters:
+## Input parameters:
 ```yaml
     DomainName: my.super.cool.dnsname  # FQDN For the ACM Certificate
     HostedZoneID: XZXZXXXZZZZZZZ  # AWS R53 HostedZone for DNS verification of domain ownership 

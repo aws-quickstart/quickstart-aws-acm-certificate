@@ -1,31 +1,43 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: "(qs-1qu5sufei) Creates R53 records and ACM Certificate."
+Description: "(qs-1qu5sufei) Create a public ACM Certificate."
 Metadata:
+  LintSpellExclude:
+    - Kubernetes
+    - namespace
+    - HashiCorp
+    - Vault
+    - balancer
+    - vault-ui
+    - Auto Scaling
+    - Hosted
+    - Domain
+  QuickStartDocumentation:
+    EntrypointName: "Create public ACM certificate"
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
-        default: DNS Configuration
+        default: DNS configuration
       Parameters:
       - DomainName
       - HostedZoneID
     - Label:
-        default: AWS Quick Start Configuration
+        default: AWS Quick Start configuration
       Parameters:
       - QSS3BucketName
       - QSS3BucketRegion
       - QSS3KeyPrefix
     ParameterLabels:
-      QSS3KeyPrefix:
-        default: Quick Start S3 Key Prefix
       QSS3BucketName:
-        default: Quick Start S3 Bucket Name
+        default: Quick Start S3 bucket name
+      QSS3KeyPrefix:
+        default: Quick Start S3 object key prefix
       QSS3BucketRegion:
-        default: Quick Start S3 Bucket Region
-      DomainName:
-        default: Domain Name
+        default: Quick Start S3 bucket Region
       HostedZoneID:
-        default: Route 53 Hosted Zone ID
+        default: Route 53–hosted zone ID
+      DomainName:
+        default: Domain name
 Parameters:
   # Quick Start Configuration  
   QSS3BucketName:
@@ -56,17 +68,18 @@ Parameters:
       forward slash (/).
     Type: String
   HostedZoneID:
-    Description: 'OPTIONAL: Route 53 Hosted Zone ID to use. If left blank, Route 53
-      will not be configured and DNS must be setup manually. If you specify this,
-      you must also specify DomainName'
+    Description: '[OPTIONAL]: Route 53–hosted zone ID to use. If left blank,
+      validation of the Domain will occur via email.'
     Type: String
     MaxLength: '32'
     Default: ''
   DomainName:
-    Description: 'OPTIONAL: Domain Name configured for the cluster. If left blank,
-      DNS must be configured manually, and an existing certificate must be used.'
+    Description: 'Fully qualified domain name for the ACM certificate.'
     Type: String
-    Default: ''
+    AllowedPattern: ^(?!.*?_.*?)(?!(?:[\w]+?\.)?\-[\w\.\-]*?)(?![\w]+?\-\.(?:[\w\.\-]+?))(?=[\w])(?=[\w\.\-]*?\.+[\w\.\-]*?)(?![\w\.\-]{254})(?!(?:\.?[\w\-\.]*?[\w\-]{64,}\.)+?)[\w\.\-]+?(?<![\w\-\.]*?\.[\d]+?)(?<=[\w\-]{2,})(?<![\w\-]{25})$
+    ConstraintDescription:
+      "Please enter a valid FQDN e.g. 'my.domain.name.com"
+    MaxLength: '256'
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   SetupRoute53:
@@ -88,11 +101,6 @@ Conditions:
       - Fn::Equals:
         - Ref: DomainName
         - ''
-  IsSubmodule:
-    Fn::Not:
-    - Fn::Equals:
-        - Ref: QSS3KeyPrefix
-        - quickstart-aws-acm-certificate/
 Resources:
   # So we can copy the ACM lambda everywhere
   CopyZips:
@@ -101,6 +109,7 @@ Resources:
         config:
           ignore_checks:
           - W9198
+          - W9901
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL:
@@ -161,7 +170,7 @@ Resources:
       Description: Creates and verifies an ACM certificate using DNS validation and
         route53
       Handler: lambda_function.handler
-      Runtime: python2.7
+      Runtime: python3.7
       Role:
         Fn::GetAtt:
         - ACMCertificateRole
@@ -204,11 +213,10 @@ Resources:
           Ref: DomainName
 Outputs:
   ACMCertificate:
+    Condition: SetupRoute53
     Description: ARN of the ACM-Generated SSL Certificate
-    Value:
-      Fn::If:
-      - SetupRoute53
-      - Fn::GetAtt:
-        - ACMCertificateDNS
-        - Arn
-      - Ref: ACMCertificateEmail
+    Value: !GetAtt "ACMCertificateDNS.Arn"
+  ACMCertificateArn:
+    Condition: UseEmailForACMValidation
+    Description: ARN of the ACM-Generated SSL Certificate
+    Value: !Ref "ACMCertificateEmail"
