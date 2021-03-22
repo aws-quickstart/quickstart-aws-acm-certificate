@@ -1,1 +1,3 @@
-// placeholder
+
+=== Create public ACM certificate
+include::quickstart-aws-acm-certificate.template.adoc[]

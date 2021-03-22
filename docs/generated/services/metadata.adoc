@@ -1,1 +1,10 @@
-// placeholder
+
+:template_aws_certificatemanager_certificate:
+:template_aws_cloudformation_customresource:
+:template_aws_cloudformation_stack:
+:template_aws_iam_role:
+:template_aws_lambda_function:
+:template_certificatemanager:
+:template_cloudformation:
+:template_iam:
+:template_lambda:
