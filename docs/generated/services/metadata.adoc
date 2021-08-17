@@ -2,6 +2,7 @@
 :template_aws_certificatemanager_certificate:
 :template_aws_cloudformation_customresource:
 :template_aws_cloudformation_stack:
+:template_aws_iam_policy:
 :template_aws_iam_role:
 :template_aws_lambda_function:
 :template_certificatemanager:
