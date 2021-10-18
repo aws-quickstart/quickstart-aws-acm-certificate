@@ -25,6 +25,9 @@ project:
       QSS3BucketName: $[taskcat_autobucket]
       QSS3BucketRegion: $[taskcat_current_region]
       QSS3Prefix: quickstart-aws-acm-certificate/
+      HostedZoneID: overrride
+      DomainName: override
+      SubjectAlternativeNames: override
 tests:
    multiregion-test:
      regions:
