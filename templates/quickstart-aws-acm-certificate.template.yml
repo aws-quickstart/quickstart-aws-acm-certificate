@@ -86,6 +86,7 @@ Parameters:
     Description: ARN of a pre-deployed IAM Role with sufficient permissions for the lambda;
       see the ACMCertificateRole resource in this template for reference
     Type: String
+    Default: ''
   SubjectAlternativeNames:
     Description: 'Subject Alternative Names seperated by commas. Must be valid FQDNs'
     Type: CommaDelimitedList
