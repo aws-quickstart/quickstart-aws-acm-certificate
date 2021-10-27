@@ -14,6 +14,7 @@ Metadata:
       Parameters:
       - DomainName
       - HostedZoneID
+      - SubjectAlternativeNames
     - Label:
         default: AWS Quick Start configuration
       Parameters:
@@ -37,6 +38,8 @@ Metadata:
         default: Domain name
       IamRoleArn:
         default: ARN of a pre-deployed IAM Role
+      SubjectAlternativeNames:
+        default: Subject AlternativeNames
 Parameters:
   # Quick Start Configuration  
   QSS3BucketName:
@@ -83,8 +86,21 @@ Parameters:
     Description: ARN of a pre-deployed IAM Role with sufficient permissions for the lambda;
       see the ACMCertificateRole resource in this template for reference
     Type: String
+  SubjectAlternativeNames:
+    Description: 'Subject Alternative Names seperated by commas. Must be valid FQDNs'
+    Type: CommaDelimitedList
+    AllowedPattern: ^(?!.*?_.*?)(?!(?:[\w]+?\.)?\-[\w\.\-]*?)(?![\w]+?\-\.(?:[\w\.\-]+?))(?=[\w])(?=[\w\.\-]*?\.+[\w\.\-]*?)(?![\w\.\-]{254})(?!(?:\.?[\w\-\.]*?[\w\-]{64,}\.)+?)[\w\.\-]+?(?<![\w\-\.]*?\.[\d]+?)(?<=[\w\-]{2,})(?<![\w\-]{25})$
+    ConstraintDescription:
+      "Please enter a valid FQDN e.g. 'my.domain.name.com, seperated by commas"
+    Default: ''
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+  UserProvidedSAN: !Not
+    - !Equals
+      - !Join
+        - ','
+        - !Ref SubjectAlternativeNames
+      - ''
   SetupRoute53:
     Fn::And:
     - Fn::Not:
@@ -203,23 +219,32 @@ Resources:
         - Arn
       HostedZoneId:
         Ref: HostedZoneID
-      HostNames:
-      - Ref: DomainName
-      - Fn::Join:
-        - ''
-        - - "*."
-          - Ref: DomainName
+      HostNames: !Split
+        - ','
+        - !Join
+          - ','
+          - - !Sub "*.${DomainName}"
+            - !If
+              - UserProvidedSAN
+              - !Join [',', !Ref SubjectAlternativeNames]
+              - !Ref AWS::NoValue
+            - !Ref DomainName
+
   ACMCertificateEmail:
     Condition: UseEmailForACMValidation
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName:
         Ref: DomainName
-      SubjectAlternativeNames:
-      - Fn::Join:
-        - ''
-        - - "*."
-          - Ref: DomainName
+      SubjectAlternativeNames: !If
+        - UserProvidedSAN
+        - !Split
+          - ','
+          - !Join
+            - ','
+            - - !Sub "*.${DomainName}"
+              - !Join [',', !Ref SubjectAlternativeNames]
+        - !Sub "*.${DomainName}"
       DomainValidationOptions:
       - DomainName:
           Ref: DomainName
