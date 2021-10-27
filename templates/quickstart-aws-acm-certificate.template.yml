@@ -21,6 +21,10 @@ Metadata:
       - QSS3BucketName
       - QSS3BucketRegion
       - QSS3KeyPrefix
+    - Label:
+        default: IAM
+      Parameters:
+      - IamRoleArn
     ParameterLabels:
       QSS3BucketName:
         default: Quick Start S3 bucket name
@@ -32,6 +36,8 @@ Metadata:
         default: Route 53–hosted zone ID
       DomainName:
         default: Domain name
+      IamRoleArn:
+        default: ARN of a pre-deployed IAM Role
       SubjectAlternativeNames:
         default: Subject AlternativeNames
 Parameters:
@@ -76,6 +82,10 @@ Parameters:
     ConstraintDescription:
       "Please enter a valid FQDN e.g. 'my.domain.name.com"
     MaxLength: '256'
+  IamRoleArn:
+    Description: ARN of a pre-deployed IAM Role with sufficient permissions for the lambda;
+      see the ACMCertificateRole resource in this template for reference
+    Type: String
   SubjectAlternativeNames:
     Description: 'Subject Alternative Names seperated by commas. Must be valid FQDNs'
     Type: CommaDelimitedList
@@ -110,6 +120,13 @@ Conditions:
       - Fn::Equals:
         - Ref: DomainName
         - ''
+  DeployIam:
+    Fn::And:
+      - Condition: SetupRoute53
+      - Fn::Not:
+        - Fn::Equals:
+          - Ref: IamRoleArn
+          - ''
 Resources:
   # So we can copy the ACM lambda everywhere
   CopyZips:
@@ -131,7 +148,7 @@ Resources:
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
         SourceObjects: "functions/packages/ACMCert/lambda.zip"
   ACMCertificateRole:
-    Condition: SetupRoute53
+    Condition: DeployIam
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -145,6 +162,7 @@ Resources:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
   ACMCertificatePolicy:
     Type: AWS::IAM::Policy
+    Condition: DeployIam
     Properties:
       Roles:
         - !Ref ACMCertificateRole
@@ -186,14 +204,13 @@ Resources:
         route53
       Handler: lambda_function.handler
       Runtime: python3.7
-      Role: !GetAtt "ACMCertificateRole.Arn"
+      Role: !If [DeployIam, !GetAtt "ACMCertificateRole.Arn", !Ref IamRoleArn]
       Timeout: 900
       Code:
         S3Bucket: !GetAtt "CopyZips.Outputs.LambdaZipsBucket"
         S3Key: !Sub "${QSS3KeyPrefix}functions/packages/ACMCert/lambda.zip"
   ACMCertificateDNS:
     Condition: SetupRoute53
-    DependsOn: ACMCertificatePolicy
     Type: AWS::CloudFormation::CustomResource
     Properties:
       ServiceToken:
