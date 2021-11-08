@@ -1,3 +1,4 @@
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: "(qs-1qu5sufei) Create a public ACM Certificate."
 Metadata:
@@ -41,7 +42,7 @@ Metadata:
       SubjectAlternativeNames:
         default: Subject AlternativeNames
 Parameters:
-  # Quick Start Configuration  
+  # Quick Start Configuration
   QSS3BucketName:
     AllowedPattern: '^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$'
     ConstraintDescription:
@@ -120,13 +121,14 @@ Conditions:
       - Fn::Equals:
         - Ref: DomainName
         - ''
-  DeployIam:
-    Fn::And:
-      - Condition: SetupRoute53
-      - Fn::Not:
-        - Fn::Equals:
-          - Ref: IamRoleArn
-          - ''
+  CustomerProvidedIAM:
+    Fn::Not:
+      - Fn::Equals:
+        - Ref: IamRoleArn
+        - ''
+  StackProvidedIAM:
+    Fn::Not:
+      - Condition: CustomerProvidedIAM
 Resources:
   # So we can copy the ACM lambda everywhere
   CopyZips:
@@ -148,7 +150,7 @@ Resources:
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
         SourceObjects: "functions/packages/ACMCert/lambda.zip"
   ACMCertificateRole:
-    Condition: DeployIam
+    Condition: StackProvidedIAM
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -160,42 +162,25 @@ Resources:
           Action: sts:AssumeRole
       ManagedPolicyArns:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-  ACMCertificatePolicy:
-    Type: AWS::IAM::Policy
-    Condition: DeployIam
-    Properties:
-      Roles:
-        - !Ref ACMCertificateRole
-      PolicyName: lambda-acm
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Action:
-          - acm:RequestCertificate
-          Resource:
-          - "*"
-        - Effect: Allow
-          Action:
-          - acm:DescribeCertificate
-          - acm:DeleteCertificate
-          Resource:
-          - !Sub "arn:${AWS::Partition}:acm:${AWS::Region}:${AWS::AccountId}:certificate/*"
-        - Effect: Allow
-          Action:
-          - lambda:InvokeFunction
-          Resource:
-          - !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${ACMCertificateLambda}"
-        - Effect: Allow
-          Action:
-          - route53:ChangeResourceRecordSets
-          Resource:
-            - Fn::Sub: arn:${AWS::Partition}:route53:::hostedzone/${HostedZoneID}
-        - Effect: Allow
-          Action:
-          - logs:FilterLogEvents
-          Resource:
-          - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${ACMCertificateLambda}:*"
+      Policies:
+        - PolicyName: "ACM"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action: "acm:RequestCertificate"
+              Resource: "*"
+            - Effect: Allow
+              Action:
+              - acm:DescribeCertificate
+              - acm:DeleteCertificate
+              Resource:
+              - !Sub "arn:${AWS::Partition}:acm:${AWS::Region}:${AWS::AccountId}:certificate/*"
+            - Effect: Allow
+              Action:
+              - route53:ChangeResourceRecordSets
+              Resource:
+                - Fn::Sub: arn:${AWS::Partition}:route53:::hostedzone/${HostedZoneID}
   ACMCertificateLambda:
     Condition: SetupRoute53
     Type: AWS::Lambda::Function
@@ -204,7 +189,7 @@ Resources:
         route53
       Handler: lambda_function.handler
       Runtime: python3.7
-      Role: !If [DeployIam, !GetAtt "ACMCertificateRole.Arn", !Ref IamRoleArn]
+      Role: !If [StackProvidedIAM, !GetAtt ACMCertificateRole.Arn, !Ref IamRoleArn]
       Timeout: 900
       Code:
         S3Bucket: !GetAtt "CopyZips.Outputs.LambdaZipsBucket"
