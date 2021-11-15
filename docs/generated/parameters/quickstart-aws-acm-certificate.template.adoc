@@ -4,7 +4,8 @@
 |===
 |Parameter label (name) |Default value|Description|Domain name
 (`DomainName`)|`**__Requires input__**`|Fully qualified domain name for the ACM certificate.|Route 53–hosted zone ID
-(`HostedZoneID`)|`**__Blank string__**`|[OPTIONAL]: Route 53–hosted zone ID to use. If left blank, validation of the Domain will occur via email.
+(`HostedZoneID`)|`**__Blank string__**`|[OPTIONAL]: Route 53–hosted zone ID to use. If left blank, validation of the Domain will occur via email.|Subject AlternativeNames
+(`SubjectAlternativeNames`)|`**__Blank string__**`|Subject Alternative Names seperated by commas. Must be valid FQDNs
 |===
 .AWS Quick Start configuration
 [width="100%",cols="16%,11%,73%",options="header",]
@@ -13,4 +14,10 @@
 (`QSS3BucketName`)|`aws-quickstart`|S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 bucket Region
 (`QSS3BucketRegion`)|`us-east-1`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.|Quick Start S3 object key prefix
 (`QSS3KeyPrefix`)|`quickstart-aws-acm-certificate/`|S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+|===
+.IAM
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|ARN of a pre-deployed IAM Role
+(`IamRoleArn`)|`**__Blank string__**`|ARN of a pre-deployed IAM Role with sufficient permissions for the lambda; see the ACMCertificateRole resource in this template for reference
 |===
