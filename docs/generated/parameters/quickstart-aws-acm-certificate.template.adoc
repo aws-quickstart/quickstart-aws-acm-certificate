@@ -3,9 +3,9 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Domain name
-(`DomainName`)|`\**__Requires input__**`|Fully qualified domain name for the ACM certificate.|Route 53–hosted zone ID
-(`HostedZoneID`)|`\**__Blank string__**`|[OPTIONAL]: Route 53–hosted zone ID to use. If left blank, validation of the Domain will occur via email.|Subject AlternativeNames
-(`SubjectAlternativeNames`)|`\**__Blank string__**`|Subject Alternative Names seperated by commas. Must be valid FQDNs
+(`DomainName`)|`**__Requires input__**`|Fully qualified domain name for the ACM certificate.|Route 53–hosted zone ID
+(`HostedZoneID`)|`**__Blank string__**`|[OPTIONAL]: Route 53–hosted zone ID to use. If left blank, validation of the Domain will occur via email.|Subject AlternativeNames
+(`SubjectAlternativeNames`)|`**__Blank string__**`|Subject Alternative Names seperated by commas. Must be valid FQDNs
 |===
 .AWS Quick Start configuration
 [width="100%",cols="16%,11%,73%",options="header",]
@@ -19,5 +19,5 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|ARN of a pre-deployed IAM Role
-(`IamRoleArn`)|`\**__Blank string__**`|ARN of a pre-deployed IAM Role with sufficient permissions for the lambda; see the ACMCertificateRole resource in this template for reference
+(`IamRoleArn`)|`**__Blank string__**`|ARN of a pre-deployed IAM Role with sufficient permissions for the lambda; see the ACMCertificateRole resource in this template for reference
 |===
