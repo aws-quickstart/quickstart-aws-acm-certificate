@@ -26,6 +26,7 @@ Metadata:
         default: IAM
       Parameters:
       - IamRoleArn
+      - PermissionsBoundaryArn
     ParameterLabels:
       QSS3BucketName:
         default: Quick Start S3 bucket name
@@ -39,6 +40,8 @@ Metadata:
         default: Domain name
       IamRoleArn:
         default: ARN of a pre-deployed IAM Role
+      PermissionsBoundaryArn:
+        default: Will be attached to all created IAM Roles to satisfy security requirements
       SubjectAlternativeNames:
         default: Subject AlternativeNames
 Parameters:
@@ -86,6 +89,10 @@ Parameters:
   IamRoleArn:
     Description: ARN of a pre-deployed IAM Role with sufficient permissions for the lambda;
       see the ACMCertificateRole resource in this template for reference
+    Type: String
+    Default: ''
+  PermissionsBoundaryArn:
+    Description: Will be attached to all created IAM Roles to satisfy security requirements
     Type: String
     Default: ''
   SubjectAlternativeNames:
@@ -149,6 +156,7 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
         SourceObjects: "functions/packages/ACMCert/lambda.zip"
+        PermissionsBoundaryArn: !Ref PermissionsBoundaryArn
   ACMCertificateRole:
     Condition: StackProvidedIAM
     Type: AWS::IAM::Role
