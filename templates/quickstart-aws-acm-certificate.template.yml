@@ -136,6 +136,7 @@ Conditions:
   StackProvidedIAM:
     Fn::Not:
       - Condition: CustomerProvidedIAM
+  PermissionsBoundaryProvided: !Not [!Equals ["", !Ref PermissionsBoundaryArn]]
 Resources:
   # So we can copy the ACM lambda everywhere
   CopyZips:
@@ -161,6 +162,12 @@ Resources:
     Condition: StackProvidedIAM
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary:
+        !If [
+          PermissionsBoundaryProvided,
+          !Ref PermissionsBoundaryArn,
+          !Ref AWS::NoValue,
+        ]
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
