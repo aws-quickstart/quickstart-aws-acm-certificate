@@ -1,4 +1,9 @@
-# quickstart-aws-acm-certificate
+## Deprecation Notice
+
+:x: This repository is subject to deprecation in Q4 2024. For more details, [please review this announcement](https://github.com/aws-ia/.announcements/issues/1). 
+
+
+## quickstart-aws-acm-certificate
 This Quick Start module provides a simple way to create validated public ACM certificates using
 either DNS or email validation. The DNS validation for the certificate is automated through custom
 lambda 
